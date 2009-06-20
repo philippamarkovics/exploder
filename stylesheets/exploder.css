@@ -1,3 +1,26 @@
+body {
+  font-family:Helvetica, Arial, sans-serif;
+}
+
 #demo {
   margin:60px 0 0 100px;
+}
+
+#play {
+  position:fixed;
+  right:0;
+  top:0;
+  background:#666;
+  color:#fff;
+  padding:10px;
+  font-size:20px;
+  text-decoration:none;
+}
+
+#play:hover {
+  background:#333;
+}
+
+#play:active {
+  background:#000;
 }
