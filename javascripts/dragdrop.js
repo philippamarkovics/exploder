@@ -78,65 +78,6 @@ Object.extend(Draggable, {
   }
 });
 
-// TODO: make DragRelations more generic, provide callbacks
-var DragRelation = Class.create({
-  initialize: function(draggables, options) {
-    this.draggables = draggables || [];
-
-    this.options = Object.extend({
-      snapX: 10,
-      snapY: 10
-    }, options);
-
-    this.draggables.each(function(draggable){
-      draggable.options.beforeDrag = this.checkRelations.bind(this);
-    }.bind(this));
-  },
-  
-  checkRelations: function(currentDraggable, proposedLeft, proposedTop) {
-    // TODO: Make this performing better, check for smallest delta!
-    var left = proposedLeft, top = proposedTop;
-    this.draggables.each(function(draggable){
-      if(draggable != currentDraggable) {
-        
-        var deltaX = proposedLeft - draggable.element.offsetLeft;
-        var deltaY = proposedTop  - draggable.element.offsetTop;
-        
-        var x = this.options.snapX, y = this.options.snapY;
-        
-        if((deltaX < x && deltaX > 0) || (deltaX > -x && deltaX < 0)) {
-          left = draggable.element.offsetLeft;
-          Ruler.show('x', draggable.element.offsetLeft);
-        }
-        else {
-          Ruler.hide('x');
-        }
-        
-        if((deltaY < y && deltaY > 0) || (deltaY > -y && deltaY < 0)) {
-          top = draggable.element.offsetTop;
-          Ruler.show('y', draggable.element.offsetTop);
-        }
-        else {
-          Ruler.hide('y');
-        }
-      }
-    }.bind(this));
-
-    return { left: left, top: top };
-  },
-  
-  addDraggable: function(draggable) {
-    draggable.options.beforeDrag = this.checkRelations.bind(this);
-    this.draggables.push(draggable);
-  }
-});
-
-Object.extend(String.prototype, {
-  toInt: function() {
-    return parseInt(this);
-  }
-});
-
 (function() {
   function checkForDraggables(event) {
     if (Draggable.isDraggable(event.element()))
@@ -155,15 +96,7 @@ Object.extend(String.prototype, {
       Draggable.active.onDrag(event);
   };
 
-  function processKey(event) {
-    if(event.keyCode == Event.KEY_ESC) {
-      var customEvent = event.element().fire('escape:pressed');
-      if (customEvent.stopped) event.stop();
-    }
-  };
-
   document.observe('mousedown', checkForDraggables);
   document.observe('mouseup', releaseDraggables);
   document.observe('mousemove', drag);
-  document.observe('keypress', processKey);
 })();

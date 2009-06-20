@@ -10,6 +10,7 @@ var Exploder = {
   setup: function() {
     this.pieces = [];
     this.positions = [];
+    this.draggables = [];
     var w = this.picture.getWidth() / 3, h = this.picture.getHeight() / 3,
         p = this.picture.cumulativeOffset(), offset = 15;
     (3).times(function(i) {
@@ -28,7 +29,7 @@ var Exploder = {
         this.positions.push({ left: x, top: y });
         this.pieces.push(piece);
         this.container.insert(piece);
-        new Draggable(piece);
+        this.draggables.push(new Draggable(piece));
       }, this);
     }, this);
     this.picture.setOpacity(0);
