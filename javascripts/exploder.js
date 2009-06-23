@@ -73,10 +73,36 @@ var Exploder = {
     this.picture.setOpacity(1);
   },
   
+  getDragTarget: function(draggable) {
+    function overlap(o1, o2) {
+      var overlapping = (o1[0]>=o2[0] && o1[0]<=o2[2] && o1[1]>=o2[1] && o1[1]<=o2[3]) ||
+          (o1[2]>=o2[0] && o1[2]<=o2[2] && o1[3]>=o2[1] && o1[3]<=o2[3]) ||
+          (o1[0]>=o2[0] && o1[2]<=o2[2] && o1[1]>=o2[1] && o1[3]<=o2[3]) ||
+          (o1[2]>=o2[0] && o1[0]<=o2[2] && o1[3]>=o2[1] && o1[1]<=o2[3]);
+      if (overlapping) {
+        var f1 = (o1[2]-o1[0])*(o1[3]-o1[1]),
+            f2 = (o2[2]-o2[0])*(o2[3]-o2[1]),
+            ovl = [o1[0]>o2[0]?o1[0]:o2[0], o1[1]>o2[1]?o1[1]:o2[1], o1[3]<o2[3]?o1[2]:o2[2], o1[3]<o2[3]?o1[3]:o2[3]],
+            a = ovl[2]-ovl[0],
+            b = ovl[3]-ovl[1];
+        return f1>f2 ? ((a*b)/f2) : ((a*b)/f1);
+      } 
+      else {
+        return 0;
+      }
+    }
+    return this.pieces.without(draggable).sortBy(function(piece) {
+      var o1 = { pos: draggable.cumulativeOffset(), dims: draggable.getDimensions() },
+          o2 = { pos: piece.cumulativeOffset(), dims: piece.getDimensions() };
+      return overlap(
+        [o1.pos.left, o1.pos.top, o1.pos.left+o1.dims.width, o1.pos.top+o1.dims.height],
+        [o2.pos.left, o2.pos.top, o2.pos.left+o2.dims.width, o2.pos.top+o2.dims.height]
+      );
+    }).last();
+  },
+  
   onDrag: function(event, draggable) {
-    draggable.hide();
-    var target = document.elementFromPoint(event.clientX, event.clientY);
-    draggable.show();
+    var target = this.getDragTarget(draggable);
 
     if (!target.hasClassName('piece'))
       return;
