@@ -12,10 +12,10 @@ var Exploder = {
     this.positions = [];
     this.draggables = [];
     var w = this.picture.getWidth() / 3, h = this.picture.getHeight() / 3,
-        p = this.picture.cumulativeOffset(), offset = 15;
+        p = this.picture.cumulativeOffset(), offset = 15, n = 0;
     (3).times(function(i) {
       (3).times(function(j) {
-        var piece = new Element('div', { className: 'piece' }).setStyle({
+        var piece = new Element('div', { className: 'piece', id: 'piece' + n }).setStyle({
           width: w + 'px',
           height: h + 'px',
           position: 'absolute',
@@ -33,6 +33,7 @@ var Exploder = {
           onDrag: this.onDrag.bind(this),
           onDrop: this.onDrop.bind(this)
         }));
+        n++;
       }, this);
     }, this);
     this.picture.setOpacity(0);
@@ -107,32 +108,29 @@ var Exploder = {
     if (!target.hasClassName('piece'))
       return;
 
-    this.reorderTo(target, draggable);
+    if ((this.fx.state == 'finished') && this.reorderTo(target, draggable)) {
+      this.renderPositions(this.pieces, { 
+        omitElement: draggable,
+        after: this.checkOrder.bind(this),
+        duration: .2
+      });
+    }
+  },
 
-    if (this.fx.state == 'running')
-      this.fx.cancel();
-
-    this.renderPositions(this.pieces, { 
-      omitElement: draggable,
-      after: this.checkOrder.bind(this),
-      duration: .2
-    });  
-  },  
-  
   onDrop: function(event, draggable) {
     this.renderPositions(this.pieces);
   },
-  
+
   reorderTo: function(target, draggable) {
     var sourceIndex = this.pieces.indexOf(draggable);
-    this.pieces.splice(sourceIndex, 1);
-
     var targetIndex = this.pieces.indexOf(target);
 
-    if (targetIndex >= sourceIndex) targetIndex++;
+    var orig = this.pieces.clone();
+    this.pieces.splice(sourceIndex, 1);
     this.pieces.splice(targetIndex, 0, draggable);
+    return orig != this.pieces;
   },
-  
+
   checkOrder: function() {
     
   }
