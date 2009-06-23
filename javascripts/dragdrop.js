@@ -34,7 +34,8 @@ var Draggable = Class.create({
   release: function(event) {
     this.delta = null;
     Draggable.active = null;
-    this.options.onDrop();
+    this.element.style.zIndex = this.originalzIndex;
+    this.options.onDrop(event, this.element);
   },
   
   onDrag: function(event) {
@@ -51,8 +52,9 @@ var Draggable = Class.create({
     }
     this.element.style.left = left + 'px';
     this.element.style.top = top + 'px';
-
-    this.options.onDrag();
+    this.originalzIndex = this.element.style.zIndex;
+    this.element.style.zIndex = 10000;
+    this.options.onDrag(event, this.element);
   }
 });
 

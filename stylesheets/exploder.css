@@ -24,3 +24,5 @@ body {
 #play:active {
   background:#000;
 }
+
+.marked { border:3px solid #0f0; }
